@@ -1,6 +1,6 @@
-# qrc-aisf-proposal-
+## qrc-aisf-proposal-
 A proposal for standards of AI
-flowchart TD
+   
     A[AI Validator Start] --> B{OCR Command}
     B -->|Compliance| C[Core Tests]
     B -->|Extended| D[Optional Extended Tests]
