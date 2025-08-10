@@ -1,3 +1,18 @@
+# 🧠 AI System Validator (Universal Compliance Framework)
+
+A universal, open-source framework for validating AI and compute nodes, ensuring compliance, threat detection, and system integrity for global, governmental, and enterprise use. Designed for transparency and community auditing as part of `Appel420/qrc-aisf-proposal-/tree/Global-solutions`.
+
+## 🔁 Validation Flow
+```mermaid
+graph TD
+    A[AI System Validator<br>Threat Feed + TPM] --> B(Request Compliance Check)
+    B --> C[Core Tests]
+    C --> D{Extended Tests<br>(if applicable)}
+    C --> E[Hardware Attestation<br>Request Signature]
+    E --> F[Signature Verified]
+    F --> G[Recheck Threat Feeds + TPM]
+    G --> A
+
 Implementation Notes
 	•	Integrate key validation checks into all API call entry points.
 	•	Centralize audit logs with tamper-proof records.
