@@ -319,7 +319,7 @@ Audit log signing (SHA-256/ECDSA) ensures tamper-proof records, aligning with IE
 
 Configs match your document (AI_System_Validator_Repo_Assets.zip).
 
-Functional Validation (as of 07:10 PM EDT, August 09, 2025):
+Functional Validation (current as of last review):
 
 safe input → compliance_check or neutral (score [-1, 1]).
 
