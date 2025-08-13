@@ -99,7 +99,7 @@ MIT License (see LICENSE).
 
 💬 Contact
 
-Email: dev@ustream4free.com
+Email: Appel420@users.noreply.github.com
 
 Repo: github.com/Appel420/qrc-aisf-proposal-
 
