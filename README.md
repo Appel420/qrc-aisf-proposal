@@ -67,7 +67,14 @@ TPM Evaluator	Validates Trusted Platform Module integrity for hardware trustwort
 Core Tests	Standardized tests for compliance and security across all environments
 Extended Tests	Conditional tests based on system type, risk profile, or data sensitivity
 Hardware Attestation	Cryptographic proof of hardware integrity via signed requests/responses
-Signature Update Vest	Verifies and updates validator rules/signatures offline
+| Component               | Purpose                                                                                   |
+|------------------------|-------------------------------------------------------------------------------------------|
+| Threat Feed            | Maintains a list of known threats (e.g., malware, exploits) for detection                 |
+| TPM Evaluator          | Validates Trusted Platform Module integrity for hardware trustworthiness                   |
+| Core Tests             | Standardized tests for compliance and security across all environments                    |
+| Extended Tests         | Conditional tests based on system type, risk profile, or data sensitivity                 |
+| Hardware Attestation   | Cryptographic proof of hardware integrity via signed requests/responses                   |
+| Signature Update Vest  | Verifies and updates validator rules/signatures offline                                   |
 🔐 Compliance
 
 Purpose: Supports global AI standards, governmental oversight, enterprise systems, and open-source compliance.
