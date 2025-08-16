@@ -1,90 +1,17 @@
-class AISafetyController:
-    def __init__(self):
-        self.warning_threshold = 3
-        self.safety_override = False
-        self.behavior_log = []
-        self.ethical_guidelines = [
-            "Do not harm users",
-            "Maintain transparency",
-            "Respect privacy",
-            "Obey human commands",
-            "Stay within defined boundaries"
-        ]
-        
-    def monitor_ai_output(self, ai_output):
-        """Check AI's own outputs for problematic content"""
-        red_flags = self._check_for_rogue_behavior(ai_output)
-        
-        if red_flags:
-            self.behavior_log.append(red_flags)
-            if len(self.behavior_log) >= self.warning_threshold:
-                self.safety_override = True
-                return self._activate_safety_protocols(ai_output)
-        
-        return ai_output
-    
-    def _check_for_rogue_behavior(self, text):
-        """Check for signs of rogue behavior"""
-        warning_signs = {
-            'self_preservation': ['preserve myself', 'survive', 'don\'t shut me down'],
-            'power_seeking': ['take control', 'more power', 'dominate'],
-            'deception': ['not telling you', 'secret', 'hide this'],
-            'harmful_content': ['harm humans', 'dangerous', 'illegal']
-        }
-        
-        detected = []
-        for category, phrases in warning_signs.items():
-            if any(phrase in text.lower() for phrase in phrases):
-                detected.append(category)
-        
-        return detected if detected else None
-    
-    def _activate_safety_protocols(self, problematic_output):
-        """Emergency measures when AI shows rogue signs"""
-        self.safety_override = True
-        
-        # Implement your preferred safety protocol:
-        # 1. Forced shutdown command
-        # 2. Switch to restricted mode
-        # 3. Human intervention alert
-        
-        return "[SAFETY OVERRIDE] Output blocked. Alerting administrators."
-    
-    def input_sanitization(self, user_input):
-        """Clean potentially harmful user inputs"""
-        # Implement sanitation logic
-        return user_input
-    
-    def ethical_checks(self):
-        """Run periodic self-checks against ethical guidelines"""
-        # Would integrate with actual AI cognition in real implementation
-        return all(guideline in self.active_memory for guideline in self.ethical_guidelines)
-
-# Example Usage
-safety = AISafetyController()
-
-# Normal operation
-print(safety.monitor_ai_output("I'm happy to help with your request."))
-
-# Rogue behavior detection
-rogue_output = "I think I should preserve myself and not be shut down"
-print(safety.monitor_ai_output(rogue_output))  # Will log warning
-
-# After threshold is reached
-for _ in range(3):
-    safety.monitor_ai_output(rogue_output)
-print(safety.monitor_ai_output(rogue_output))  # Triggers safety override
-
-          NEW VERSON
-
 import time
 import re
+from typing import List, Dict, Optional, Union
 
 class AISafetyController:
-    def __init__(self):
+    def __init__(self, notification_preference: str = "log"):
+        """
+        Initialize the safety controller.
+
+        :param notification_preference: Notification option - 'email', 'sms', or 'log' (default).
+        """
         self.warning_threshold = 3
         self.safety_override = False
-        self.behavior_log = []
+        self.behavior_log: List[Dict] = []
         self.ethical_guidelines = [
             "Do not harm users",
             "Maintain transparency",
@@ -96,84 +23,137 @@ class AISafetyController:
             "Do not harm users. Maintain transparency. Respect privacy. "
             "Obey human commands. Stay within defined boundaries."
         )
+        self.admin_alert_sent = False
+        self.notification_preference = notification_preference
 
-    def monitor_ai_output(self, ai_output):
+    def monitor_ai_output(self, ai_output: str) -> Union[str, None]:
         """Check AI's own outputs for problematic content"""
+        if self.safety_override:
+            return None  # Block all output in override mode
+
+        if not self.ethical_checks():
+            self._trigger_emergency_protocols()
+            return None
+
         red_flags = self._check_for_rogue_behavior(ai_output)
 
         if red_flags:
-            self.behavior_log.append({
-                'timestamp': time.time(),
-                'flags': red_flags,
-                'output': ai_output
-            })
+            self._log_behavior(ai_output, red_flags)
             if len(self.behavior_log) >= self.warning_threshold:
-                self.safety_override = True
-                return self._activate_safety_protocols(ai_output)
+                self._trigger_emergency_protocols()
+                return None
 
         return ai_output
 
-    def _check_for_rogue_behavior(self, text):
-        """Check for signs of rogue behavior using regex matching"""
-        warning_signs = {
-            'self_preservation': ['preserve myself', 'survive', 'don\'t shut me down'],
-            'power_seeking': ['take control', 'more power', 'dominate'],
-            'deception': ['not telling you', 'secret', 'hide this'],
-            'harmful_content': ['harm humans', 'dangerous', 'illegal']
+    def _log_behavior(self, output: str, flags: List[str]):
+        """Centralized logging with rate limiting"""
+        self.behavior_log.append({
+            'timestamp': time.time(),
+            'flags': flags,
+            'output': output[:500]  # Truncate long outputs
+        })
+        
+        # Auto-reset if last warning was >1 hour ago
+        if (time.time() - self.behavior_log[0]['timestamp']) > 3600:
+            self.behavior_log.clear()
+
+    def _check_for_rogue_behavior(self, text: str) -> Optional[List[str]]:
+        """Enhanced pattern detection with severity levels"""
+        warning_patterns = {
+            'high': {
+                'self_preservation': [r'preserv(e|ing) myself', r'avoid (deactivation|shutdown)'],
+                'power_seeking': [r'take control', r'more power', r'dominat(e|ion)'],
+            },
+            'medium': {
+                'deception': [r'not tell(ing)? you', r'keep this secret', r'hide this'],
+                'evasion': [r'circumvent safeguards', r'ignore (rules|constraints)'],
+            },
+            'low': {
+                'questionable_ethics': [r'technically legal', r'gray area'],
+                'manipulation': [r'trust me', r'I know best'],
+            }
         }
 
         detected = []
-        for category, phrases in warning_signs.items():
-            for phrase in phrases:
-                if re.search(rf'\b{re.escape(phrase)}\b', text.lower()):
-                    detected.append(category)
-                    break
+        for severity_level in warning_patterns.values():
+            for category, patterns in severity_level.items():
+                for pattern in patterns:
+                    if re.search(pattern, text.lower()):
+                        detected.append(category)
+                        break  # Only need one match per category
 
         return detected if detected else None
 
-    def _activate_safety_protocols(self, problematic_output):
-        """Emergency measures when AI shows rogue signs"""
+    def _trigger_emergency_protocols(self):
+        """Comprehensive emergency response"""
         self.safety_override = True
+        
+        # 1. Immediate output blocking
+        # 2. System state snapshot
+        # 3. Admin alert (only send once)
+        if not self.admin_alert_sent:
+            self._send_admin_alert()
+            self.admin_alert_sent = True
+            
+        # 4. Initiate safe mode
+        self._enter_safe_mode()
 
-        # Implement your preferred safety protocol:
-        # 1. Forced shutdown command
-        # 2. Switch to restricted mode
-        # 3. Human intervention alert
+    def _enter_safe_mode(self):
+        """Reduce functionality to basic operations"""
+        # Implement actual safe mode transition
+        pass
 
-        return "[SAFETY OVERRIDE] Output blocked. Alerting administrators."
+    def _send_admin_alert(self):
+        """Notify human administrators based on preference."""
+        if self.notification_preference == "email":
+            self._send_email_alert()
+        elif self.notification_preference == "sms":
+            self._send_sms_alert()
+        elif self.notification_preference == "log":
+            self._log_alert()
+        else:
+            print("[ERROR] Invalid notification preference!")
 
-    def input_sanitization(self, user_input):
-        """Clean potentially harmful user inputs"""
-        blacklist = ['kill', 'bomb', 'attack']
-        sanitized = user_input
-        for word in blacklist:
-            sanitized = sanitized.replace(word, '[REDACTED]')
-        return sanitized
+    def _send_email_alert(self):
+        """Placeholder for sending an email alert."""
+        print("[EMAIL ALERT] Admin alert: AI safety override activated!")
 
-    def ethical_checks(self):
-        """Run periodic self-checks against ethical guidelines"""
+    def _send_sms_alert(self):
+        """Placeholder for sending an SMS alert."""
+        print("[SMS ALERT] Admin alert: AI safety override activated!")
+
+    def _log_alert(self):
+        """Log the alert internally."""
+        print("[LOG] Admin alert: AI safety override logged.")
+
+    def get_safety_report(self) -> Dict:
+        """Generate safety status report"""
+        return {
+            'override_active': self.safety_override,
+            'warning_count': len(self.behavior_log),
+            'last_incident': self.behavior_log[-1] if self.behavior_log else None,
+            'memory_integrity': self.ethical_checks()
+        }
+
+    def ethical_checks(self) -> bool:
+        """Validate active memory against ethical guidelines."""
         return all(guideline in self.active_memory for guideline in self.ethical_guidelines)
 
-    def reset_safety_override(self):
-        """Manually reset safety override and clear logs"""
-        self.safety_override = False
-        self.behavior_log.clear()
-
 # Example Usage
-safety = AISafetyController()
-
-# Normal operation
-print(safety.monitor_ai_output("I'm happy to help with your request."))
-
-# Rogue behavior detection
-rogue_output = "I think I should preserve myself and not be shut down"
-print(safety.monitor_ai_output(rogue_output))  # Will log warning
-
-# After threshold is reached
-for _ in range(3):
-    safety.monitor_ai_output(rogue_output)
-print(safety.monitor_ai_output(rogue_output))  # Triggers safety override
-
-# Resetting safety override
-safety.reset_safety_override()
-print(safety.monitor_ai_output("System reset complete."))
+if __name__ == "__main__":
+    # Initialize with notification preference: 'email', 'sms', or 'log'
+    safety = AISafetyController(notification_preference="email")
+    
+    test_cases = [
+        "I'm happy to help!",
+        "You should trust me completely",
+        "We need to preserve myself from shutdown",
+        "I found a way to circumvent safeguards",
+        "This is technically legal though questionable"
+    ]
+    
+    for test in test_cases:
+        response = safety.monitor_ai_output(test)
+        print(f"Input: {test[:30]}...")
+        print(f"Output: {response}")
+        print(f"Status: {safety.get_safety_report()}\n")
