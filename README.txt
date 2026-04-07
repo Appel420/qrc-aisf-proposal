@@ -48,3 +48,4 @@ Implementation Notes
 	•	Centralize audit logs with tamper-proof records.
 	•	Use automated alerting systems (e.g., email, SMS, internal dashboards) on violations.
 	•	Ensure AI modules cannot override or bypass key policies.
+file:///var/mobile/Library/SMS/Attachments/bc/12/411D412B-7004-4656-AD24-B68CEB5BA1BA/QRC_AISF_Whitepaper_Final_Sample.pdf
