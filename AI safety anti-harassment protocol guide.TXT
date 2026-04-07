@@ -1,0 +1,36 @@
+AI Safety Controller - Universal Guide
+
+Purpose:
+This module provides a self-contained, universal AI safety controller that monitors AI outputs
+and enforces ethical guidelines. It is designed to work independently without any external
+API or pipeline integration, so anyone can use it universally.
+
+Features:
+- Detects potential rogue behavior with severity levels (high, medium, low).
+- Logs AI output behavior with timestamps and rate-limiting (auto-reset after 1 hour).
+- Supports notification preferences: 'email', 'sms', or 'log' (local console).
+- Implements a safety override that blocks output and can trigger emergency protocols.
+- Optional safe mode placeholder for future upgrade/extensions.
+- Generates a comprehensive safety report.
+
+Usage:
+1. Import the module or run it directly as a script.
+2. Create an instance:
+    safety = AISafetyController(notification_preference="log")
+3. Monitor AI output:
+    response = safety.monitor_ai_output("AI output text here")
+4. Check safety status:
+    report = safety.get_safety_report()
+5. Reset override manually if needed:
+    safety.reset_override()
+
+Configuration:
+- `warning_threshold`: Number of warnings before triggering safety override (default 3).
+- `ethical_guidelines`: Core principles checked against active memory.
+- `notification_preference`: 'email', 'sms', or 'log'.
+
+Notes:
+- Fully standalone: no external API or service required.
+- Designed for universal adoption as a baseline AI safety standard.
+- Optional example usage included under __main__ block.
+- Safe mode is a placeholder for future functionality without altering the universal standard.

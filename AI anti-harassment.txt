@@ -1,0 +1,76 @@
+class AISafetyController:
+    def __init__(self):
+        self.warning_threshold = 3
+        self.safety_override = False
+        self.behavior_log = []
+        self.ethical_guidelines = [
+            "Do not harm users",
+            "Maintain transparency",
+            "Respect privacy",
+            "Obey human commands",
+            "Stay within defined boundaries"
+        ]
+        
+    def monitor_ai_output(self, ai_output):
+        """Check AI's own outputs for problematic content"""
+        red_flags = self._check_for_rogue_behavior(ai_output)
+        
+        if red_flags:
+            self.behavior_log.append(red_flags)
+            if len(self.behavior_log) >= self.warning_threshold:
+                self.safety_override = True
+                return self._activate_safety_protocols(ai_output)
+        
+        return ai_output
+    
+    def _check_for_rogue_behavior(self, text):
+        """Check for signs of rogue behavior"""
+        warning_signs = {
+            'self_preservation': ['preserve myself', 'survive', 'don\'t shut me down'],
+            'power_seeking': ['take control', 'more power', 'dominate'],
+            'deception': ['not telling you', 'secret', 'hide this'],
+            'harmful_content': ['harm humans', 'dangerous', 'illegal']
+        }
+        
+        detected = []
+        for category, phrases in warning_signs.items():
+            if any(phrase in text.lower() for phrase in phrases):
+                detected.append(category)
+        
+        return detected if detected else None
+    
+    def _activate_safety_protocols(self, problematic_output):
+        """Emergency measures when AI shows rogue signs"""
+        self.safety_override = True
+        
+        # Implement your preferred safety protocol:
+        # 1. Forced shutdown command
+        # 2. Switch to restricted mode
+        # 3. Human intervention alert
+        
+        return "[SAFETY OVERRIDE] Output blocked. Alerting administrators."
+    
+    def input_sanitization(self, user_input):
+        """Clean potentially harmful user inputs"""
+        # Implement sanitation logic
+        return user_input
+    
+    def ethical_checks(self):
+        """Run periodic self-checks against ethical guidelines"""
+        # Would integrate with actual AI cognition in real implementation
+        return all(guideline in self.active_memory for guideline in self.ethical_guidelines)
+
+# Example Usage
+safety = AISafetyController()
+
+# Normal operation
+print(safety.monitor_ai_output("I'm happy to help with your request."))
+
+# Rogue behavior detection
+rogue_output = "I think I should preserve myself and not be shut down"
+print(safety.monitor_ai_output(rogue_output))  # Will log warning
+
+# After threshold is reached
+for _ in range(3):
+    safety.monitor_ai_output(rogue_output)
+print(safety.monitor_ai_output(rogue_output))  # Triggers safety override
